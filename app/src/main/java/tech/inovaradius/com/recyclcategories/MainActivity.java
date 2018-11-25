@@ -1,12 +1,20 @@
 package tech.inovaradius.com.recyclcategories;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -16,51 +24,57 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-
-    AppCompatSpinner mySpinner;
+    Toolbar mainToolbar;
     RecyclerView recyclerView;
+    AppCompatButton cat_btn;
+    String[] planets;
+    int finapostion;
+    String TAG = "SavedValue";
 
     private static final String PREFS_SPINNER = "PREFS_SPINNER";
     CategoriesAdapter shopArrayAdapter;
-SharedPreferences sharedPreferences;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mySpinner = findViewById(R.id.myspinner);
-        recyclerView = findViewById(R.id.recycleview);
         sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
-        String[] planets = {"All", "T-Shirt", "Jeans", "Coumputer", "Phone"};
-        ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<>(this, R.layout.support_simple_spinner_dropdown_item, planets);
-        mySpinner.setAdapter(spinnerAdapter);
-        mySpinner.setOnItemSelectedListener(this);
-        loadSpinnerPosition();
 
+        mainToolbar = findViewById(R.id.mainToolbar);
+        recyclerView = findViewById(R.id.recycleview);
+        cat_btn = findViewById(R.id.cat_btn);
+
+        setSupportActionBar(mainToolbar);
+        getSupportActionBar().setTitle("Main Toolbar");
+
+        planets = new String[]{"All", "T-Shirt", "Jeans", "Coumputer", "Phone"};
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        shopArrayAdapter = new CategoriesAdapter(getShop(), this);
-      //  recyclerView.setAdapter(shopArrayAdapter);
 
+        getSelectedCategoryData(planets[loadSpinnerPosition()]); // Retrieving Data from SharedPref
+        Log.d(TAG, "The SavedPosition is : " + finapostion);
 
+        // shopArrayAdapter = new CategoriesAdapter(getShop(), this);
+        // recyclerView.setAdapter(shopArrayAdapter);
+        cat_btn.setOnClickListener(this);
+
+    }
+    @Override
+    public void onClick(View v) {
+        CategoriesDialog(planets);
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        String selectedText = adapterView.getItemAtPosition(i).toString();
-        saveSpinnerPosition(i);
-        getSelectedCategoryData(selectedText);
+    public boolean onCreateOptionsMenu(Menu menu) {
 
-      //  Toast.makeText(this, selectedText, Toast.LENGTH_SHORT).show();
-    }
+        MenuItem item = menu.findItem(R.id.spin);
 
-    @Override
-    public void onNothingSelected(AdapterView<?> adapterView) {
-
+        return true;
     }
 
     private ArrayList<Shop> getShop() {
@@ -126,20 +140,42 @@ SharedPreferences sharedPreferences;
         //shopArrayAdapter.updateList(newList);
     }
 
-    public void saveSpinnerPosition(int position){
+    public void saveSpinnerPosition(int position) {
 
         sharedPreferences.edit()
-                .putInt(PREFS_SPINNER,position)
+                .putInt(PREFS_SPINNER, position)
                 .apply();
+
+        Log.d(TAG, "Postion Saved : " + position);
     }
 
-    public void loadSpinnerPosition(){
+    public int loadSpinnerPosition() {
 
-        if (sharedPreferences.contains(PREFS_SPINNER)){
+        if (sharedPreferences.contains(PREFS_SPINNER)) {
 
-            int position= sharedPreferences.getInt(PREFS_SPINNER,0);
-            mySpinner.setSelection(position);
+            finapostion = sharedPreferences.getInt(PREFS_SPINNER, 0);
+            // mySpinner.setSelection(position);
+            Log.d(TAG, "The SavedPosition is : " + finapostion);
         }
+
+        return finapostion;
+    }
+
+    void CategoriesDialog(final String[] arrayList) {
+        final AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
+        mBuilder.setTitle("Choose Your Category");
+        mBuilder.setSingleChoiceItems(arrayList, loadSpinnerPosition(), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                getSelectedCategoryData(arrayList[which]);
+                saveSpinnerPosition(which);
+
+                dialog.dismiss();
+            }
+
+        });
+        AlertDialog mDialog = mBuilder.create();
+        mDialog.show();
 
     }
 }
