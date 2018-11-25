@@ -31,7 +31,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     AppCompatButton cat_btn;
     String[] planets;
     int finapostion;
-    String TAG = "SavedValue";
+    String MSG = "SavedValue";
 
     private static final String PREFS_SPINNER = "PREFS_SPINNER";
     CategoriesAdapter shopArrayAdapter;
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         getSelectedCategoryData(planets[loadSpinnerPosition()]); // Retrieving Data from SharedPref
-        Log.d(TAG, "The SavedPosition is : " + finapostion);
+        Log.d(MSG, "The SavedPosition is : " + finapostion);
 
         // shopArrayAdapter = new CategoriesAdapter(getShop(), this);
         // recyclerView.setAdapter(shopArrayAdapter);
@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 .putInt(PREFS_SPINNER, position)
                 .apply();
 
-        Log.d(TAG, "Postion Saved : " + position);
+        Log.d(MSG, "Postion Saved : " + position);
     }
 
     public int loadSpinnerPosition() {
@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             finapostion = sharedPreferences.getInt(PREFS_SPINNER, 0);
             // mySpinner.setSelection(position);
-            Log.d(TAG, "The SavedPosition is : " + finapostion);
+            Log.d(MSG, "The SavedPosition is : " + finapostion);
         }
 
         return finapostion;
