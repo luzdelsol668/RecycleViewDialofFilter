@@ -3,6 +3,7 @@ package tech.inovaradius.com.recyclcategories;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mainToolbar = findViewById(R.id.mainToolbar);
         recyclerView = findViewById(R.id.recycleview);
         cat_btn = findViewById(R.id.cat_btn);
+
 
         setSupportActionBar(mainToolbar);
         getSupportActionBar().setTitle("Main Toolbar");
@@ -162,20 +165,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     void CategoriesDialog(final String[] arrayList) {
-        final AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this);
-        mBuilder.setTitle("Choose Your Category");
+        final AlertDialog.Builder mBuilder = new AlertDialog.Builder(MainActivity.this, R.style.MaterialThemeDialog);
+        LayoutInflater inflater = getLayoutInflater();
+        View view = inflater.inflate(R.layout.titlebar, null);
+        mBuilder.setCustomTitle(view);
+        mBuilder.setCancelable(false);
+
+        // mBuilder.setTitle("Choose Your Category");
         mBuilder.setSingleChoiceItems(arrayList, loadSpinnerPosition(), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 getSelectedCategoryData(arrayList[which]);
                 saveSpinnerPosition(which);
-
                 dialog.dismiss();
             }
 
         });
+
+        mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
         AlertDialog mDialog = mBuilder.create();
         mDialog.show();
+
 
     }
 }
